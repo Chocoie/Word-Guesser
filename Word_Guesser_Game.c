@@ -10,6 +10,7 @@
 void playRound(char starword[], char answer[]); //play a round of word guessor
 void maskWord (char starword[], char answer[], int size); //mask word with stars to display
 int guessTheWord(char answer [], char userguess[]); //guess the word
+int doesContain(char userguess[], char c); //checks if a letter is in the word
 void updateStarWord(char starword[], char answer[], char userguess[]); //replace respective *
 void playAgain(int *play); //ask user to play again
 
@@ -223,11 +224,28 @@ int guessTheWord(char answer[], char userguess[])
 	else
 		return -1;
 }
+
+int doesContain(char userguess[], char c)
+{
+	for(int i = 0; i < strlen(userguess); i++)
+	{
+		if(userguess[i] == c)
+			return 1;
+	}
+	return 0;
+}
+
 void updateStarWord(char starword[], char answer[], char userguess[])
 {
+	int containsYorN = 0;
 	for(int i = 0; i < strlen(answer); i++)
 	{
-		if(userguess[i] == answer[i])
+		containsYorN = doesContain(answer, userguess[i]);
+		if(containsYorN == 1 && userguess[i] != answer[i])
+		{
+			printf("The word does have a: '\e[1m%c\e[0m' just not in the correct space\n", userguess[i]);
+		}
+		else if(userguess[i] == answer[i])
 			starword[i] = userguess[i];
 	}
 	chomp(starword);

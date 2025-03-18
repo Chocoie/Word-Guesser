@@ -7,14 +7,14 @@
 #define length 6
 
 //function prototypes
+char* allLowerCase(char word[]); //coverts all the letters to lowercase
 void playRound(char starword[], char answer[]); //play a round of word guessor
+char* getWord(char answer[]); //gets input for player's word
 void maskWord (char starword[], char answer[], int size); //mask word with stars to display
 int guessTheWord(char answer [], char userguess[]); //guess the word
 int doesContain(char userguess[], char c); //checks if a letter is in the word
 void updateStarWord(char starword[], char answer[], char userguess[]); //replace respective *
 void playAgain(int *play); //ask user to play again
-
-//Dr. Steinberg functions
 void clearBuffer();
 void chomp(char word[]);
 
@@ -60,7 +60,6 @@ int main()
 		playAgain(playPtr);
 	}
 	
-	
 	if(play == 2);
 	{
 		//ending statments
@@ -71,18 +70,20 @@ int main()
 	return 0;
 }
 
-void playRound(char starword[], char answer[])
+char* allLowerCase(char word[])
 {
-	//variables
-	char userguess[length];
-	int guessCountP1 = 1, guessCountP2 = 1;
-	int correctOrNot = -1;
-	int size = strlen(starword);
+	//changes all chars in word to lowercase
+	for(int i = 0; i < strlen(word); i++)
+		word[i] = tolower(word[i]);
+	return word;
+}
+
+char* getWord(char answer[])
+{
 	int valid = 0;
-	int i = 0;
+	int i;
 	char ch;
-	
-	printf("Player 1, enter a 5 letter word: ");
+
 	//ensures user enters valid word
 	while(valid != 1)
 	{
@@ -104,26 +105,42 @@ void playRound(char starword[], char answer[])
 		}
 	
 		answer[i] = '\0';  //null-terminate the string
-	
-		//printf("\nYou entered: %s\n", answer);  //debug output
 		printf("\n");
+		
+		answer = allLowerCase(answer);
 
+		//checks if word is of correct length
 		if(strlen(answer) == (length-1))
 			valid = 1;
 		else
 			printf("Try again\n");
 
 	}
+	return answer;
+}
+
+void playRound(char starword[], char answer[])
+{
+	//variables
+	char userguess[length];
+	int guessCountP1 = 1, guessCountP2 = 1;
+	int correctOrNot = -1;
+	int size = strlen(starword);
+	
+	printf("Player 1, enter a 5 letter word: ");
+	answer = getWord(answer);
 
 	//function call
 	maskWord(starword, answer, length-1);
 
 	printf("Player 2, you must try and guess Player 1's word.\n");
 
+	//allows player 2 to keep trying to guess the word
 	while(correctOrNot != 0)
 	{
 		printf("Guess %d: ", guessCountP1);
 		correctOrNot = guessTheWord(answer, userguess);
+		//checks if guess is correct
 		if(correctOrNot == 0)
 		{
 			printf("Congrats, you guessed the word!\n");
@@ -138,42 +155,12 @@ void playRound(char starword[], char answer[])
 	printf("************************************************************************\n");
 	printf("************************************************************************\n");
 	printf("Player 2, enter a 5 letter word: ");
-	valid = 0;
+	//reset variable
 	correctOrNot = -1;
-	while(valid != 1)
-	{
-		i = 0;
-		//mask work
-		while (i < length) {
-			ch = getch();  //read a character without echoing it
-	
-			if (ch == '\r' || ch == '\n')  //stop on Enter key
-				break;
-	
-			if (ch == 8 && i > 0) {  //handle Backspace (ASCII 8)
-				printf("\b \b");  //erase character from screen
-				i--;
-			} else if (i < length) {
-				answer[i++] = ch;
-				printf("*");  //print an asterisk instead of the letter
-			}
-		}
-	
-		answer[i] = '\0';  //null-terminate the string
-	
-		//printf("\nYou entered: %s\n", answer);  //debug output
-		printf("\n");
-
-		if(strlen(answer) == (length-1))
-			valid = 1;
-		else
-			printf("Try again\n");
-
-	}
+	answer = getWord(answer);
 
 	//function call
 	maskWord(starword, answer, length-1);
-	//printf("%s\n", starword);
 
 	printf("Player 1, you must try and guess Player 2's word.\n");
 
@@ -216,15 +203,17 @@ int guessTheWord(char answer[], char userguess[])
 	//user guess
 	scanf("%s", userguess);
 	chomp(userguess);
+	userguess = allLowerCase(userguess);
 	//checks if user guess matches answer
 	int correctOrNot = strcmp(userguess, answer);
-	
+
 	if(correctOrNot == 0)
 		return 0;
 	else
 		return -1;
 }
 
+//determines if the userguess contains the specified char
 int doesContain(char userguess[], char c)
 {
 	for(int i = 0; i < strlen(userguess); i++)
@@ -240,6 +229,7 @@ void updateStarWord(char starword[], char answer[], char userguess[])
 	int containsYorN = 0;
 	for(int i = 0; i < strlen(answer); i++)
 	{
+		//let user know the some answer and userguess has some of the same char(s)
 		containsYorN = doesContain(answer, userguess[i]);
 		if(containsYorN == 1 && userguess[i] != answer[i])
 		{
